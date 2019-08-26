@@ -3,6 +3,7 @@ import platform
 import sys
 import threading
 import subprocess
+import time
 
 import aiy.assistant.auth_helpers
 from aiy.assistant.library import Assistant
@@ -63,11 +64,16 @@ class MyAssistant(object):
         aiy.audio.say('My IP address is %s' % ip_address.decode('utf-8'))
 
     def _email_picture(self):
-        _take_picture()
-        email("Here is the picture you asked for:", "Took Picture", email_user, email_password, "rishavb123@gmail.com", files=['none'])
+        aiy.audio.say('Sure I can take a picture for you')
+        self._take_picture()
+        email('Here is the picture you asked for:', 'Took Picture', email_user, email_password, 'rishavb123@gmail.com', files=['/home/pi/Desktop/image.jpg'])
+        aiy.audio.say("I emailed the picture to you")
 
     def _take_picture(self):
-        camera.capture("~/Desktop/image.jpg")
+        for i in range(3, 0, -1):
+            aiy.audio.say(str(i))
+            time.sleep(1)
+        camera.capture('/home/pi/Desktop/image.jpg')
 
     def _process_event(self, event):
         status_ui = aiy.voicehat.get_status_ui()
