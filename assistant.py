@@ -75,6 +75,10 @@ class MyAssistant(object):
             time.sleep(1)
         camera.capture('/home/pi/Desktop/image.jpg')
 
+    def _close(self):
+        aiy.audio.say("Good bye")
+        sys.exit()
+
     def _process_event(self, event):
         status_ui = aiy.voicehat.get_status_ui()
         if event.type == EventType.ON_START_FINISHED:
@@ -105,6 +109,8 @@ class MyAssistant(object):
             elif text == 'take a picture':
                 self._assistant.stop_conversation()
                 self._email_picture()
+            elif text == "bye" or text == "good bye" or text == "exit" or text == "close":
+                self._close()
 
         elif event.type == EventType.ON_END_OF_UTTERANCE:
             status_ui.status('thinking')
