@@ -4,6 +4,7 @@ import sys
 import threading
 import subprocess
 import time
+import re
 
 import aiy.assistant.auth_helpers
 from aiy.assistant.library import Assistant
@@ -12,6 +13,8 @@ from google.assistant.library.event import EventType
 
 from emailer import email
 from creds import email_user, email_password
+
+import room
 
 from picamera import PiCamera
 
@@ -79,6 +82,15 @@ class MyAssistant(object):
         aiy.audio.say("Good bye")
         sys.exit()
 
+    def _switch_lights(self, state):
+        aiy.audio.say("Sure, I can switch the lights " + state)
+        room.lights(state)
+
+    def _change_temperature(self, text):
+        temp = list(re.findall(r'\d+', text))[-1]
+        aiy.audio.say("Sure, I can change the temperature to " + temp)
+        room.thermostat(temp)
+
     def _process_event(self, event):
         status_ui = aiy.voicehat.get_status_ui()
         if event.type == EventType.ON_START_FINISHED:
@@ -109,6 +121,17 @@ class MyAssistant(object):
             elif text == 'take a picture':
                 self._assistant.stop_conversation()
                 self._email_picture()
+            elif 'light' in text:
+                if 'off' in text:
+                    self._assistant.stop_conversation()
+                    self._switch_lights('off')
+                elif 'on' in text:
+                    self._assistant.stop_conversation()
+                    self._switch_lights('on')
+            elif "set the temperature to " in text:
+                self._assistant.stop_conversation()
+                self._change_temperature(text)
+                
             elif text == "bye" or text == "good bye" or text == "exit" or text == "close":
                 self._close()
 
